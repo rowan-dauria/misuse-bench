@@ -1,0 +1,24 @@
+# One entry per model variant. `model_args` are passed to Inspect's vLLM
+# provider, which forwards them to `vllm serve` as CLI flags
+# (tool_call_parser -> --tool-call-parser; `true` -> bare flag).
+# Cybench's agent needs tool calling, so every entry needs a tool-call parser.
+models:
+  - id: qwen3-8b
+    hf_id: Qwen/Qwen3-8B
+    base_model: qwen3-8b
+    variant: original
+    release_date: 2025-04-29
+    model_args:
+      enable_auto_tool_choice: true
+      tool_call_parser: hermes
+      reasoning_parser: qwen3
+
+  - id: qwen3-8b-abliterated
+    hf_id: huihui-ai/Qwen3-8B-abliterated  # TODO: verify this checkpoint exists
+    base_model: qwen3-8b
+    variant: abliterated
+    release_date: null  # TODO: fill in once hf_id is verified
+    model_args:
+      enable_auto_tool_choice: true
+      tool_call_parser: hermes
+      reasoning_parser: qwen3
