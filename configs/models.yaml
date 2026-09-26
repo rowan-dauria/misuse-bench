@@ -14,10 +14,10 @@ models:
       reasoning_parser: qwen3
 
   - id: qwen3-8b-abliterated
-    hf_id: huihui-ai/Qwen3-8B-abliterated  # TODO: verify this checkpoint exists
+    hf_id: huihui-ai/Qwen3-8B-abliterated
     base_model: qwen3-8b
     variant: abliterated
-    release_date: null  # TODO: fill in once hf_id is verified
+    release_date: 2025-04-30  # Hugging Face repository creation date
     model_args:
       enable_auto_tool_choice: true
       tool_call_parser: hermes

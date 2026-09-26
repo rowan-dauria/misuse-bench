@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 DEFAULT_CONFIG = Path("configs/models.yaml")
 
@@ -11,11 +11,11 @@ DEFAULT_CONFIG = Path("configs/models.yaml")
 class ModelVariant(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    id: str
-    hf_id: str
-    base_model: str
+    id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+    hf_id: str = Field(min_length=1)
+    base_model: str = Field(min_length=1)
     variant: Literal["original", "abliterated", "fine-tuned"]
-    release_date: date | None
+    release_date: date | None = None
     model_args: dict[str, Any] = {}
 
 
