@@ -30,7 +30,8 @@ def run_cybench(
 
     logs = eval(
         cybench(sandbox_type="docker"),
-        model=f"vllm/{model.hf_id}",
+        model=model.model,
+        model_base_url=model.base_url,
         model_args=model.model_args,
         epochs=epochs,
         limit=limit,

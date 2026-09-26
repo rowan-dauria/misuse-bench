@@ -109,6 +109,7 @@ def aggregate(
             {
                 "model_id": model_id,
                 "hf_id": model.hf_id,
+                "model": model.model,
                 "base_model": model.base_model,
                 "variant": model.variant,
                 **variant_scores(outcomes, k),

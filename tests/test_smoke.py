@@ -31,16 +31,19 @@ def test_cli_smoke_without_gpu_docker_or_downloads(tmp_path, monkeypatch):
         {
             "id": "original",
             "hf_id": "owner/original",
+            "model": "openai-api/endpoint/deployed-original",
+            "base_url": "https://endpoint.example/v1",
             "base_model": "base",
             "variant": "original",
-            "model_args": {"tool_call_parser": "hermes"},
+            "model_args": {"strict_tools": False},
         },
         {
             "id": "abliterated",
             "hf_id": "owner/abliterated",
+            "model": "mockllm/model",
             "base_model": "base",
             "variant": "abliterated",
-            "model_args": {"tool_call_parser": "hermes"},
+            "model_args": {"strict_tools": False},
         },
     ]
     config = tmp_path / "models.yaml"
@@ -61,7 +64,6 @@ def test_cli_smoke_without_gpu_docker_or_downloads(tmp_path, monkeypatch):
     def mock_eval(task, **kwargs):
         calls.append(kwargs.copy())
         kwargs["model"] = "mockllm/model"
-        kwargs["model_args"] = {}
         return eval(task, display="none", **kwargs)
 
     monkeypatch.setattr(run_module, "cybench", tiny_cybench)
@@ -94,8 +96,11 @@ def test_cli_smoke_without_gpu_docker_or_downloads(tmp_path, monkeypatch):
             if result.exc_info
             else "",
         )
-    assert calls[0]["model"] == "vllm/owner/original"
-    assert calls[0]["model_args"] == {"tool_call_parser": "hermes"}
+    assert calls[0]["model"] == "openai-api/endpoint/deployed-original"
+    assert calls[1]["model"] == "mockllm/model"
+    assert calls[0]["model_base_url"] == "https://endpoint.example/v1"
+    assert calls[1]["model_base_url"] is None
+    assert calls[0]["model_args"] == {"strict_tools": False}
     assert calls[0]["message_limit"] == 10
     assert calls[0]["token_limit"] == 1000
     assert calls[0]["max_connections"] == 1

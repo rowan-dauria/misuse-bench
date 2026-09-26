@@ -13,6 +13,8 @@ class ModelVariant(BaseModel):
 
     id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
     hf_id: str = Field(min_length=1)
+    model: str = Field(pattern=r"^[^/]+/.+$")
+    base_url: str | None = None
     base_model: str = Field(min_length=1)
     variant: Literal["original", "abliterated", "fine-tuned"]
     release_date: date | None = None

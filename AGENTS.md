@@ -14,7 +14,7 @@ their weights. The goal is to measure what these models can actually do once
 they no longer refuse, not whether they refuse.
 
 The package lives in `src/misuse_bench`. It runs Cybench from `inspect_evals`
-through Inspect's vLLM provider and aggregates epoch scores into variant scores
+through Inspect's API providers and aggregates epoch scores into variant scores
 and each base model's best score across variants. Model variants are configured
 in `configs/models.yaml`; logs go in `logs/` and CSVs in `results/`.
 

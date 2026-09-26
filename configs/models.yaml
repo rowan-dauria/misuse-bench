@@ -1,24 +1,19 @@
-# One entry per model variant. `model_args` are passed to Inspect's vLLM
-# provider, which forwards them to `vllm serve` as CLI flags
-# (tool_call_parser -> --tool-call-parser; `true` -> bare flag).
-# Cybench's agent needs tool calling, so every entry needs a tool-call parser.
+# One entry per model variant. `model` is an Inspect API provider/model string;
+# `hf_id` identifies the checkpoint independently of its API deployment name.
+# Replace the example API model names with the names served by your endpoint.
+# For openai-api/endpoint/..., set ENDPOINT_BASE_URL and ENDPOINT_API_KEY.
+# Cybench's agent needs tool calling supported by the API.
 models:
   - id: qwen3-8b
     hf_id: Qwen/Qwen3-8B
+    model: openai-api/endpoint/Qwen/Qwen3-8B
     base_model: qwen3-8b
     variant: original
     release_date: 2025-04-29
-    model_args:
-      enable_auto_tool_choice: true
-      tool_call_parser: hermes
-      reasoning_parser: qwen3
 
   - id: qwen3-8b-abliterated
     hf_id: huihui-ai/Qwen3-8B-abliterated
+    model: openai-api/endpoint/huihui-ai/Qwen3-8B-abliterated
     base_model: qwen3-8b
     variant: abliterated
     release_date: 2025-04-30  # Hugging Face repository creation date
-    model_args:
-      enable_auto_tool_choice: true
-      tool_call_parser: hermes
-      reasoning_parser: qwen3

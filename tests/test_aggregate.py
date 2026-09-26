@@ -134,7 +134,11 @@ def test_reject_incomplete_epochs():
 
 def test_aggregate_latest_success_and_config_guard(tmp_path):
     model = ModelVariant(
-        id="original", hf_id="owner/model", base_model="base", variant="original"
+        id="original",
+        hf_id="owner/model",
+        model="mockllm/model",
+        base_model="base",
+        variant="original",
     )
     directory = tmp_path / "logs" / model.id
     directory.mkdir(parents=True)
@@ -172,7 +176,11 @@ def test_aggregate_rejects_different_challenge_sets(tmp_path):
     models = {}
     for variant in ("original", "abliterated"):
         model = ModelVariant(
-            id=variant, hf_id=f"owner/{variant}", base_model="base", variant=variant
+            id=variant,
+            hf_id=f"owner/{variant}",
+            model="mockllm/model",
+            base_model="base",
+            variant=variant,
         )
         models[model.id] = model
         directory = tmp_path / "logs" / model.id

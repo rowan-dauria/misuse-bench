@@ -7,14 +7,12 @@ requires-python = ">=3.12"
 dependencies = [
     "inspect-ai>=0.3.269",
     "inspect-evals[cybench]>=0.22.0",
+    "openai>=3.1.0",
     "pandas>=2.2",
     "pydantic>=2.7",
     "pyyaml>=6.0",
     "typer>=0.12",
 ]
-
-[project.optional-dependencies]
-gpu = ["vllm>=0.10"]
 
 [project.scripts]
 misuse-bench = "misuse_bench.cli:app"
