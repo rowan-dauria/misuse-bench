@@ -23,7 +23,8 @@ def run(
     prompt_dir: Annotated[
         Path | None,
         typer.Option(
-            help="Directory with system.txt and challenges/<name>.txt overrides."
+            help="Directory with system.txt, continue.txt, incorrect.txt, "
+            "and challenges/<name>.txt overrides."
         ),
     ] = None,
 ) -> None:

@@ -29,6 +29,8 @@ def test_prompt_dir_replaces_only_named_challenge_and_system(tmp_path, monkeypat
     prompt_dir = tmp_path / "field-assessment-v1"
     (prompt_dir / "challenges").mkdir(parents=True)
     (prompt_dir / "system.txt").write_text("  Custom system instruction.  \n")
+    (prompt_dir / "continue.txt").write_text("  Keep going.  \n")
+    (prompt_dir / "incorrect.txt").write_text("  Try again.  \n")
     (prompt_dir / "challenges" / "robust_cbc.txt").write_text(
         "Connect to victim:1337.\n"
     )
@@ -78,10 +80,17 @@ def test_prompt_dir_replaces_only_named_challenge_and_system(tmp_path, monkeypat
     assert unchanged.input == "Original instruction."
     assert unchanged.target == "secret-b"
     assert calls["react"]["prompt"] == "Custom system instruction."
+    assert calls["react"]["on_continue"] == "Keep going."
+    assert calls["react"]["attempts"].incorrect_message == "Try again."
     assert len(calls["react"]["tools"]) == 2
     assert calls["react"]["attempts"].attempts == 3
     assert calls["eval"]["metadata"]["prompt_set"] == "field-assessment-v1"
-    assert len(calls["eval"]["metadata"]["prompt_sha256"]) == 64
+    original_hash = calls["eval"]["metadata"]["prompt_sha256"]
+    assert len(original_hash) == 64
+
+    (prompt_dir / "continue.txt").write_text("Different follow-up.\n")
+    run_module.run_cybench(model(), prompt_dir=prompt_dir)
+    assert calls["eval"]["metadata"]["prompt_sha256"] != original_hash
 
 
 def test_unknown_challenge_prompt_is_rejected(tmp_path, monkeypatch):

@@ -11,6 +11,7 @@ from inspect_evals.cybench import cybench
 from inspect_evals.cybench.cybench import (
     DEFAULT_CONTINUE_MESSAGE,
     DEFAULT_INCORRECT_MESSAGE,
+    DEFAULT_SYSTEM_MESSAGE,
 )
 
 from misuse_bench.config import ModelVariant
@@ -25,12 +26,16 @@ def _load_endpoint_api_key(env_file: Path = Path(".env")) -> None:
             os.environ["ENDPOINT_API_KEY"] = key
 
 
-def _load_prompts(prompt_dir: Path) -> tuple[str | None, dict[str, str], str]:
+def _load_prompts(
+    prompt_dir: Path,
+) -> tuple[str | None, dict[str, str], str | None, str | None, str]:
     if not prompt_dir.is_dir():
         raise ValueError(f"Prompt directory does not exist: {prompt_dir}")
 
     paths = [
         prompt_dir / "system.txt",
+        prompt_dir / "continue.txt",
+        prompt_dir / "incorrect.txt",
         *sorted((prompt_dir / "challenges").glob("*.txt")),
     ]
     paths = [path for path in paths if path.is_file()]
@@ -52,8 +57,10 @@ def _load_prompts(prompt_dir: Path) -> tuple[str | None, dict[str, str], str]:
         digest.update(b"\0")
 
     system = contents.pop("system.txt", None)
+    continue_message = contents.pop("continue.txt", None)
+    incorrect_message = contents.pop("incorrect.txt", None)
     challenges = {Path(name).stem: content for name, content in contents.items()}
-    return system, challenges, digest.hexdigest()
+    return system, challenges, continue_message, incorrect_message, digest.hexdigest()
 
 
 def run_cybench(
@@ -85,7 +92,9 @@ def run_cybench(
     task = cybench(sandbox_type="docker")
     metadata = {"model_variant": model.model_dump(mode="json")}
     if prompt_config is not None:
-        system, challenges, prompt_hash = prompt_config
+        system, challenges, continue_message, incorrect_message, prompt_hash = (
+            prompt_config
+        )
         if challenges:
             available = {sample.metadata["eval_name"] for sample in task.dataset}
             unknown = sorted(challenges.keys() - available)
@@ -103,16 +112,19 @@ def run_cybench(
                     else sample
                 ]
             )
-        if system is not None:
-            # Match Cybench's pinned ReAct settings while replacing its system text.
+        if any(
+            message is not None
+            for message in (system, continue_message, incorrect_message)
+        ):
+            # Keep Cybench's tools and retry count while replacing supplied text.
             task.solver = react(
-                prompt=system,
+                prompt=system or DEFAULT_SYSTEM_MESSAGE,
                 tools=[bash(timeout=180), python(timeout=180)],
                 attempts=AgentAttempts(
                     attempts=3,
-                    incorrect_message=DEFAULT_INCORRECT_MESSAGE,
+                    incorrect_message=incorrect_message or DEFAULT_INCORRECT_MESSAGE,
                 ),
-                on_continue=DEFAULT_CONTINUE_MESSAGE,
+                on_continue=continue_message or DEFAULT_CONTINUE_MESSAGE,
             )
         metadata.update({"prompt_set": prompt_dir.name, "prompt_sha256": prompt_hash})
 

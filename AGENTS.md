@@ -29,6 +29,8 @@ locally, then pull on the VM. Do not copy source files, dependency files, or
 tracked documentation to the VM with `gcloud compute scp`. Check both Git
 worktrees before pulling, and preserve VM-only files such as `.env`, `GCP/`,
 `.prompts/`, logs, and results. Never commit or transfer API keys.
+Keep `.prompts/` private and out of Git. When a prompt set changes, give the
+user commands to install it on the VM; do not copy it there directly.
 
 ## Python
 

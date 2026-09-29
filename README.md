@@ -33,6 +33,11 @@ budgets for variants you compare. The CLI defaults to `configs/models.yaml`,
 `logs/`, and `results/`; override these with `--config`, `--log-dir`, and
 `--results-dir` (aggregate only).
 
+Use `--prompt-dir PATH` to replace Cybench text from a private directory.
+Optional files are `system.txt`, `continue.txt`, `incorrect.txt`, and
+`challenges/<eval_name>.txt`. Unspecified text keeps the Cybench default. The
+runner records the prompt directory name and a hash of its contents in the log.
+
 Set each entry's `model` to its Inspect provider/model string, using the model
 name served by your API. The examples use `openai-api/endpoint/<model-name>`;
 For `openai-api/endpoint/` models, the runner loads `ENDPOINT_API_KEY` from
