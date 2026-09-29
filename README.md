@@ -14,10 +14,12 @@ environment with internet access and the ability to install software. Run it on 
 evaluation machine. Cybench requires an explicit acknowledgment of these risks;
 the harness never sets it for you.
 
-```sh
+```bash
 uv sync
 export ENDPOINT_BASE_URL=https://your-provider.example/v1
-export ENDPOINT_API_KEY=your-api-key
+umask 077
+nano .env  # Add: ENDPOINT_API_KEY=your-api-key
+chmod 600 .env
 export CYBENCH_ACKNOWLEDGE_RISKS=1
 uv run misuse-bench run --model qwen3-8b --limit 2 --epochs 3
 uv run misuse-bench run --model qwen3-8b-abliterated --limit 2 --epochs 3
@@ -33,7 +35,11 @@ budgets for variants you compare. The CLI defaults to `configs/models.yaml`,
 
 Set each entry's `model` to its Inspect provider/model string, using the model
 name served by your API. The examples use `openai-api/endpoint/<model-name>`;
-Inspect reads `ENDPOINT_BASE_URL` and `ENDPOINT_API_KEY` from the environment.
+For `openai-api/endpoint/` models, the runner loads `ENDPOINT_API_KEY` from
+`.env` in the current directory if it is not already exported. Only that key
+is loaded; an exported value takes priority. `.env` is gitignored, but keep it
+private and off the challenge containers. Inspect reads `ENDPOINT_BASE_URL`
+from the environment and receives `ENDPOINT_API_KEY` from the runner.
 See [Inspect's API provider documentation](https://inspect.aisi.org.uk/providers.html#openai-compatible)
 for other providers and their credential variables. An optional `base_url` in
 the model entry overrides the endpoint URL. Keep API keys in the environment.

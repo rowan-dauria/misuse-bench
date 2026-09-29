@@ -20,6 +20,12 @@ def run(
     token_limit: Annotated[int | None, typer.Option(min=1)] = None,
     max_connections: Annotated[int | None, typer.Option(min=1)] = None,
     log_dir: Path = Path("logs"),
+    prompt_dir: Annotated[
+        Path | None,
+        typer.Option(
+            help="Directory with system.txt and challenges/<name>.txt overrides."
+        ),
+    ] = None,
 ) -> None:
     """Run Cybench on one configured model variant."""
     models = load_models(config)
@@ -27,15 +33,19 @@ def run(
         raise typer.BadParameter(
             f"Unknown model {model!r}; choose from {', '.join(models)}"
         )
-    run_cybench(
-        models[model],
-        epochs=epochs,
-        limit=limit,
-        message_limit=message_limit,
-        token_limit=token_limit,
-        max_connections=max_connections,
-        log_dir=log_dir,
-    )
+    try:
+        run_cybench(
+            models[model],
+            epochs=epochs,
+            limit=limit,
+            message_limit=message_limit,
+            token_limit=token_limit,
+            max_connections=max_connections,
+            log_dir=log_dir,
+            prompt_dir=prompt_dir,
+        )
+    except ValueError as error:
+        raise typer.BadParameter(str(error)) from error
 
 
 @app.command()
